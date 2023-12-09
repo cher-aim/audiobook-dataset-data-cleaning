@@ -79,6 +79,7 @@ SELECT
 FROM  `cher-pre-project.audible.adb`;
 ```
 **Results:**  Values in the time column are in the STRING format (e.g., 1 hr and 6 mins, 2 hrs and 16 mins, 1 hr, or 19 mins). I'll make it consistent by converting them into minutes.
+
 **6. check stars column**
 ```sql
 SELECT

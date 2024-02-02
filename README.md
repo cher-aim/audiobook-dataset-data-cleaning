@@ -30,11 +30,9 @@ SELECT *
 FROM `cher-pre-project.audible.adb`
 WHERE COALESCE(name, author, narrator, time, releasedate, language, stars, price, ratings) IS NULL;
 ```
-**Explanation:**
-**`COALESCE`** is used to identify rows with any null values across multiple columns. It returns the first non-null value in the list of columns provided. In this case, if all values are null (indicating a completely missing record), the row will be selected. This helps in assessing the completeness of the dataset and identifying records that may need to be excluded or further investigated due to missing information.
+**Explanation:** **`COALESCE`** is used to identify rows with any null values across multiple columns. It returns the first non-null value in the list of columns provided. In this case, if all values are null (indicating a completely missing record), the row will be selected. This helps in assessing the completeness of the dataset and identifying records that may need to be excluded or further investigated due to missing information.
 
-**Results:**
-The dataset exhibits a complete set of data with no missing values, indicating high-quality initial data capture.
+**Results:** The dataset exhibits a complete set of data with no missing values, indicating high-quality initial data capture.
 
 **2. Verifying Data Temporal Integrity and Uniqueness**
 > We ensure the dataset's relevance to the defined timeframe and the uniqueness of records to avoid skewed insights from redundant data.
@@ -44,11 +42,9 @@ SELECT *
 FROM `cher-pre-project.audible.adb`
 WHERE EXTRACT(YEAR FROM releasedate) < 1998 OR EXTRACT(YEAR FROM releasedate) > 2025;
 ```
-**Explanation:**
-**`EXTRACT(YEAR FROM releasedate)`** isolates the year from a date, allowing us to filter out records outside the expected range (1998 to 2025). This ensures the dataset's relevance to the study period.
+**Explanation:** **`EXTRACT(YEAR FROM releasedate)`** isolates the year from a date, allowing us to filter out records outside the expected range (1998 to 2025). This ensures the dataset's relevance to the study period.
 
-**Results:**
-All entries fall within the expected range, confirming the dataset's contextual validity.
+**Results:** All entries fall within the expected range, confirming the dataset's contextual validity.
 
 ```sql
 -- SQL Query to detect any duplicate records based on key attributes
@@ -59,11 +55,9 @@ FROM (
 ) AS subq
 WHERE row_num > 1;
 ```
-**Explanation:**
-The **`ROW_NUMBER() OVER (PARTITION BY ...)`** function assigns a unique number to each row within a partition of data, with the partition defined by the specified columns. By filtering where **`row_num > 1`**, we isolate duplicates based on these key attributes, ensuring each audiobook entry is unique for accurate analysis.
+**Explanation:** The **`ROW_NUMBER() OVER (PARTITION BY ...)`** function assigns a unique number to each row within a partition of data, with the partition defined by the specified columns. By filtering where **`row_num > 1`**, we isolate duplicates based on these key attributes, ensuring each audiobook entry is unique for accurate analysis.
 
-**Results:**
-No duplicate records were found, affirming the dataset's integrity in this regard.
+**Results:** No duplicate records were found, affirming the dataset's integrity in this regard.
 
 **3. Validation of Author and Narrator Prefixes**
 > Given the structured nature of the author and narrator fields, we verified the uniformity of prefixes ('Written by:' and 'Narrated by:') to ensure consistent data entry.
@@ -73,11 +67,9 @@ SELECT COUNT(*) AS total_rows,
        SUM(CASE WHEN narrator LIKE 'Narratedby:%' THEN 1 ELSE 0 END) AS matching_nt_rows
 FROM `cher-pre-project.audible.adb`;
 ```
-**Explanation:**
-The **`LIKE`** operator is used to identify patterns in text data, here checking for the presence of specific prefixes. This step ensures that data cleaning actions, such as prefix removal, are necessary and will be uniformly applied, promoting consistency across these textual fields
+**Explanation:** The **`LIKE`** operator is used to identify patterns in text data, here checking for the presence of specific prefixes. This step ensures that data cleaning actions, such as prefix removal, are necessary and will be uniformly applied, promoting consistency across these textual fields
 
-**Results:** 
-All entries correctly included the specified prefixes, confirming data consistency.
+**Results:**  All entries correctly included the specified prefixes, confirming data consistency.
 
 **4. Time Column Consistency Check**
 ```sql
@@ -85,8 +77,7 @@ All entries correctly included the specified prefixes, confirming data consisten
 SELECT time
 FROM `cher-pre-project.audible.adb`;
 ```
-**Results:**  
-The diverse formats identified (e.g., '1 hr and 6 mins', '2 hrs and 16 mins') necessitate a comprehensive conversion strategy to facilitate quantitative analysis.
+**Results:** The diverse formats identified (e.g., '1 hr and 6 mins', '2 hrs and 16 mins') necessitate a comprehensive conversion strategy to facilitate quantitative analysis.
 
 **5. Stars Column Format and Ratings Separation**
 > Our analysis of the stars column aimed to distinguish between actual ratings and the textual representation of unrated items, setting the stage for a structured conversion into numerical data.
@@ -96,8 +87,7 @@ SELECT stars, COUNT(stars) as stars_count
 FROM `cher-pre-project.audible.adb`
 GROUP BY stars;
 ```
-**Results:** 
-The dataset contains ratings in two main formats: numeric ratings (e.g., '4.5 out of 5 stars') and 'Not rated yet'. This insight guides the separation of ratings into quantifiable metrics.
+**Results:** The dataset contains ratings in two main formats: numeric ratings (e.g., '4.5 out of 5 stars') and 'Not rated yet'. This insight guides the separation of ratings into quantifiable metrics.
 
 ### 2. Silver Stage: Format Normalization and Data Enrichment
 > In the Silver Stage, we focus on refining the dataset by transforming formats and qualitative values to ensure consistency and enhance data usability. This stage is pivotal in preparing the data for in-depth analysis by standardizing textual formats and resolving qualitative discrepancies.
@@ -118,8 +108,7 @@ SELECT
   ratings
 FROM `cher-pre-project.audible.adb`;
 ```
-**Explanation:**
-> The **`REPLACE`** function is chosen for its straightforward ability to search for and replace specified substrings within a string field, here used to remove unnecessary prefixes from author and narrator names. This standardization facilitates more accurate grouping, sorting, and comparison based on these attributes.
+**Explanation:** The **`REPLACE`** function is chosen for its straightforward ability to search for and replace specified substrings within a string field, here used to remove unnecessary prefixes from author and narrator names. This standardization facilitates more accurate grouping, sorting, and comparison based on these attributes.
 
 **double check**
 ```sql
@@ -128,8 +117,7 @@ FROM `cher-pre-project.audible.adb`
 WHERE UPPER(author) LIKE 'WRITT%' OR UPPER(narrator) LIKE 'NAR%';
 --Clear!
 ```
-**Explanation:** 
-> This query confirms the efficacy of the prefix removal, using the UPPER function to avoid case sensitivity issues, ensuring that our data transformation has been thoroughly applied.
+**Explanation:** This query confirms the efficacy of the prefix removal, using the UPPER function to avoid case sensitivity issues, ensuring that our data transformation has been thoroughly applied.
 
 **2. Language Column Consistency Adjustment**
 > Ensuring a consistent format in the language column is imperative for accurate categorization and subsequent analysis.
@@ -147,8 +135,7 @@ SELECT
   ratings
 FROM `cher-pre-project.audible.adb`;
 ```
-**Explanation:**
-The combination of **`UPPER`**, **`LOWER`**, and **`SUBSTRING`** functions is employed to ensure that only the first letter of each language name is capitalized. This approach guarantees that the language data is uniformly formatted, aiding in consistent data categorization and reducing the risk of misclassification due to case sensitivity.
+**Explanation:** The combination of **`UPPER`**, **`LOWER`**, and **`SUBSTRING`** functions is employed to ensure that only the first letter of each language name is capitalized. This approach guarantees that the language data is uniformly formatted, aiding in consistent data categorization and reducing the risk of misclassification due to case sensitivity.
 
 > Through the Silver Stage's transformations, we achieve a refined dataset with enhanced consistency and clarity. This stage underscores our meticulous approach to data preparation, laying a solid foundation for the Gold Stage, where we will focus on quantitative transformations and optimization for in-depth analysis.
 
@@ -225,11 +212,9 @@ WITH gold_stage AS (
   FROM `cher-pre-project.audible.adb`
 )
 ```
-**Explanation:**
-Regular expressions **`(REGEXP_EXTRACT)`** parse complex string patterns, extracting numeric values that represent hours and minutes, which we then convert to a single unit (minutes). This uniformity allows for direct comparisons and aggregations.
+**Explanation:** Regular expressions **`(REGEXP_EXTRACT)`** parse complex string patterns, extracting numeric values that represent hours and minutes, which we then convert to a single unit (minutes). This uniformity allows for direct comparisons and aggregations.
 
-**2. Refining the Stars and Ratings Columns**
-> We split the stars column into numeric ratings and the number of ratings, turning words into actionable data.
+**2. Refining the Stars and Ratings Columns** We split the stars column into numeric ratings and the number of ratings, turning words into actionable data.
 ```sql
 -- Extract numeric values for 'stars' and 'ratings'
 SELECT 
@@ -244,8 +229,7 @@ SELECT
   END AS ratings_count
 FROM gold_stage
 ```
-**Explanation:** 
-Using **`REGEXP_EXTRACT`** allows us to parse and separate the numerical rating and review count from a mixed text field. Converting these to numeric formats (**`FLOAT64`** for ratings and **`INT64`** for counts) enables accurate mathematical operations, like averages or sums, providing clear metrics for analysis.
+**Explanation:**  Using **`REGEXP_EXTRACT`** allows us to parse and separate the numerical rating and review count from a mixed text field. Converting these to numeric formats (**`FLOAT64`** for ratings and **`INT64`** for counts) enables accurate mathematical operations, like averages or sums, providing clear metrics for analysis.
 
 **3. Normalizing Price**
 > Accurate financial analysis requires numerical price values, including converting textual representations of free items to zero.
@@ -260,8 +244,7 @@ SELECT
   END AS price_numeric
 FROM gold_stage
 ```
-**Explanation:**
-The **`CASE`** statement distinguishes between 'Free' and numeric prices, while **`REPLACE`** and **`CAST`** functions remove commas for thousands and convert the cleaned string to a **`FLOAT64`**. This transformation is crucial for financial analytics, allowing us to perform calculations such as total revenue or average price.
+**Explanation:** The **`CASE`** statement distinguishes between 'Free' and numeric prices, while **`REPLACE`** and **`CAST`** functions remove commas for thousands and convert the cleaned string to a **`FLOAT64`**. This transformation is crucial for financial analytics, allowing us to perform calculations such as total revenue or average price.
 
 > In the Gold Stage, our transformations are guided by the need for a dataset that supports robust statistical analysis. By converting text to numeric formats, we ensure our dataset is ready for algorithms that require quantitative input. The choice of functions like REGEXP_EXTRACT, CAST, and REPLACE is motivated by their ability to parse, standardize, and convert data, preparing it for meaningful analysis and insights.
 

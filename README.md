@@ -30,6 +30,9 @@ SELECT *
 FROM `cher-pre-project.audible.adb`
 WHERE COALESCE(name, author, narrator, time, releasedate, language, stars, price, ratings) IS NULL;
 ```
+**Explanation:**
+**`COALESCE`** is used to identify rows with any null values across multiple columns. It returns the first non-null value in the list of columns provided. In this case, if all values are null (indicating a completely missing record), the row will be selected. This helps in assessing the completeness of the dataset and identifying records that may need to be excluded or further investigated due to missing information.
+
 **Results:**
 The dataset exhibits a complete set of data with no missing values, indicating high-quality initial data capture.
 
@@ -41,8 +44,11 @@ SELECT *
 FROM `cher-pre-project.audible.adb`
 WHERE EXTRACT(YEAR FROM releasedate) < 1998 OR EXTRACT(YEAR FROM releasedate) > 2025;
 ```
+**Explanation:**
+**`EXTRACT(YEAR FROM releasedate)`** isolates the year from a date, allowing us to filter out records outside the expected range (1998 to 2025). This ensures the dataset's relevance to the study period.
+
 **Results:**
-All entries fall within the expected temporal range, confirming the dataset's contextual validity.
+All entries fall within the expected range, confirming the dataset's contextual validity.
 
 ```sql
 -- SQL Query to detect any duplicate records based on key attributes
@@ -53,6 +59,8 @@ FROM (
 ) AS subq
 WHERE row_num > 1;
 ```
+**Explanation:**
+The **`ROW_NUMBER() OVER (PARTITION BY ...)`** function assigns a unique number to each row within a partition of data, with the partition defined by the specified columns. By filtering where **`row_num > 1`**, we isolate duplicates based on these key attributes, ensuring each audiobook entry is unique for accurate analysis.
 
 **Results:**
 No duplicate records were found, affirming the dataset's integrity in this regard.
@@ -65,9 +73,11 @@ SELECT COUNT(*) AS total_rows,
        SUM(CASE WHEN narrator LIKE 'Narratedby:%' THEN 1 ELSE 0 END) AS matching_nt_rows
 FROM `cher-pre-project.audible.adb`;
 ```
+**Explanation:**
+The **`LIKE`** operator is used to identify patterns in text data, here checking for the presence of specific prefixes. This step ensures that data cleaning actions, such as prefix removal, are necessary and will be uniformly applied, promoting consistency across these textual fields
 
 **Results:** 
-All entries correctly included the specified prefixes, confirming data consistency in textual metadata.
+All entries correctly included the specified prefixes, confirming data consistency.
 
 **4. Time Column Consistency Check**
 ```sql
@@ -109,7 +119,7 @@ SELECT
 FROM `cher-pre-project.audible.adb`;
 ```
 **Explanation:**
-> The REPLACE function is employed to eliminate the prefixes, ensuring that both author and narrator fields are standardized, focusing solely on the names, which are critical for any relational or comparative analysis.
+> The **`REPLACE`** function is chosen for its straightforward ability to search for and replace specified substrings within a string field, here used to remove unnecessary prefixes from author and narrator names. This standardization facilitates more accurate grouping, sorting, and comparison based on these attributes.
 
 **double check**
 ```sql
@@ -122,7 +132,7 @@ WHERE UPPER(author) LIKE 'WRITT%' OR UPPER(narrator) LIKE 'NAR%';
 > This query confirms the efficacy of the prefix removal, using the UPPER function to avoid case sensitivity issues, ensuring that our data transformation has been thoroughly applied.
 
 **2. Language Column Consistency Adjustment**
-> Given the importance of linguistic analysis in audiobooks, ensuring a consistent format in the language column is imperative for accurate categorization and subsequent analysis.
+> Ensuring a consistent format in the language column is imperative for accurate categorization and subsequent analysis.
 ```sql
 -- Standardize the format of the 'language' column to capitalize only the first letter
 SELECT 
@@ -138,7 +148,7 @@ SELECT
 FROM `cher-pre-project.audible.adb`;
 ```
 **Explanation:**
-The **`CONCAT`**, **`UPPER`**, and **`LOWER`** functions work together to standardize the language field, ensuring that only the first letter is capitalized. 
+The combination of **`UPPER`**, **`LOWER`**, and **`SUBSTRING`** functions is employed to ensure that only the first letter of each language name is capitalized. This approach guarantees that the language data is uniformly formatted, aiding in consistent data categorization and reducing the risk of misclassification due to case sensitivity.
 
 > Through the Silver Stage's transformations, we achieve a refined dataset with enhanced consistency and clarity. This stage underscores our meticulous approach to data preparation, laying a solid foundation for the Gold Stage, where we will focus on quantitative transformations and optimization for in-depth analysis.
 

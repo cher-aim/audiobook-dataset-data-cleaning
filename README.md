@@ -93,7 +93,7 @@ GROUP BY stars;
 > In the Silver Stage, we focus on refining the dataset by transforming formats and qualitative values to ensure consistency and enhance data usability. This stage is pivotal in preparing the data for in-depth analysis by standardizing textual formats and resolving qualitative discrepancies.
 
 **1. Standardizing Author and Narrator Fields**
-> Cleansing the **'author'** and **'narrator'** fields of predefined prefixed, which, while informative, are unnecessary for our analysis and could introducr inconsistency in data processing.
+> Cleansing the **'author'** and **'narrator'** fields of predefined prefixed, which, while informative, are unnecessary for our analysis and could introduce inconsistency in data processing.
 ```sql
 -- Remove 'Writtenby:' prefix from 'author' and 'Narratedby:' from 'narrator' for uniformity
 SELECT 
